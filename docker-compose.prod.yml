@@ -1,0 +1,35 @@
+# https://github.com/clean-docker/ghost-cms/blob/master/docker-compose.yml
+version: "3"
+services:
+  ghost:
+    image: ghost:latest
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 3030:2368
+    environment:
+      url: https://blog.lopesdesign.com
+      server__host: "0.0.0.0"
+      server__port: 2368
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: ${DB_USER}
+      database__connection__password: ${DB_PASSWORD}
+      database__connection__database: ghost
+      mail__options__auth__pass: ${MAILGUN_PASSWORD}
+    volumes:
+      - ./content:/var/lib/ghost/content
+      - ./config.production.json:/var/lib/ghost/config.production.json
+
+  db:
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./mysql:/var/lib/mysql
+
+  #nginx: (see dev docker-compose.yml for nginx settings)
